@@ -7,6 +7,9 @@ from math import cos, sin, pi
 
 from flask import Flask, render_template, Response
 
+v_fov = 50
+h_fov = 70
+
 
 class VideoCamera(object):
     def __init__(self, width, height):
@@ -91,10 +94,10 @@ class VideoCamera(object):
             self._init_state()
             return frame, self.phi, self.theta
 
-        self.theta = self.base_theta + mean_delta[0] / self.width * 69
-        self.phi = self.base_phi + mean_delta[1] / self.height * (69 / self.width * self.height)
+        self.theta = self.base_theta + mean_delta[0] / self.width * h_fov # 62
+        self.phi = self.base_phi + mean_delta[1] / self.height * v_fov # 37
 
-        print('rot = {}'.format(self.theta))
+        print('phi = {},\ttheta = {}'.format(self.phi, self.theta))
 
         # draw the tracks
         if draw_traces:
@@ -129,8 +132,7 @@ class AugmentedSpace(object):
     def get_frame(self, phi, theta):
         scene = pyrender.Scene(bg_color=np.zeros(4))
         scene.add(self.mesh)
-        camera = pyrender.PerspectiveCamera(yfov=np.pi / 3.0)
-        s = np.sqrt(2)/2
+        camera = pyrender.PerspectiveCamera(yfov = v_fov * pi / 180)
         camera_rot_y = np.array([
                [1.0, 0.0, 0.0, 0.0],
                [0.0, cos(phi), -sin(phi), 0.0],
