@@ -36,6 +36,9 @@ def do_request(sock, rpc, params=[]):
     else:
         return parse_response(data)
 
+def is_ok(resp):
+    return resp != None and resp['RC_COM'] == 0 and resp['RC'] == 0
+
 # Enums
 # --------------------------------------------------------------------------------
 
@@ -114,7 +117,7 @@ def AUT_Search(sock, Hz_Area, V_Area):
 # measuring Hz,V angles and a single distance
 def BAP_MeasDistanceAngle(sock, DistMode = 2):
     out = do_request(sock, 17017, [DistMode])
-    if out != None and out['RC_COM'] == 0 and out['RC'] == 0:
+    if is_ok(out):
         params = out["P"]
         out["P"] = {
             "dHz":      float(params[0]),
@@ -122,20 +125,26 @@ def BAP_MeasDistanceAngle(sock, DistMode = 2):
             "dDist":    float(params[2]),
             "DistMode": int(params[3]),
         }
+    else:
+        out["P"] = {}
     return out
 
 # setting the distance measurement program
 def BAP_SetMeasPrg(sock, eMeasPrg):
-    return do_request(sock, 17019, [eMeasPrg.value])
+    out = do_request(sock, 17019, [eMeasPrg.value])
+    out["P"] = {}
+    return out
 
 # setting the EDM type
 def BAP_SetTargetType(sock, eTargetType):
-    return do_request(sock, 17021, [eTargetType])
+    out = do_request(sock, 17021, [eTargetType])
+    out["P"] = {}
+    return out
 
 # getting the coordinates of a measured point
 def TMC_GetCoordinate(sock, WaitTime, Mode):
     out = do_request(sock, 2082, [WaitTime, Mode])
-    if out != None and out['RC_COM'] == 0 and out['RC'] == 0:
+    if is_ok(out):
         params = out["P"]
         out["P"] = {
             "E":             float(params[0]),
@@ -147,24 +156,28 @@ def TMC_GetCoordinate(sock, WaitTime, Mode):
             "H-Cont":        float(params[6]),
             "CoordContTime": int(params[7]),
         }
+    else:
+        out["P"] = {}
     return out
 
 # returning an angle and distance measurement
 def TMC_GetSimpleMea(sock, WaitTime, Mode):
     out = do_request(sock, 2108, [WaitTime, Mode])
-    if out != None and out['RC_COM'] == 0 and out['RC'] == 0:
+    if is_ok(out):
         params = out["P"]
         out["P"] = {
             "Hz":            float(params[0]),
             "V":             float(params[1]),
             "SlopeDistance": float(params[2]),
         }
+    else:
+        out["P"] = {}
     return out
 
 # returning a complete angle measurement
 def TMC_GetAngle1(sock, Mode):
     out = do_request(sock, 2003, [Mode])
-    if out != None and out['RC_COM'] == 0 and out['RC'] == 0:
+    if is_ok(out):
         params = out["P"]
         out["P"] = {
             "Hz":              float(params[0]),
@@ -177,35 +190,41 @@ def TMC_GetAngle1(sock, Mode):
             "InclineTime":     int(params[7]),
             "FaceDef":         int(params[8]),
         }
+    else:
+        out["P"] = {}
     return out
 
 # returning a simple angle measurement
 def TMC_GetAngle5(sock, Mode):
     out = do_request(sock, 2107, [Mode])
-    if out != None and out['RC_COM'] == 0 and out['RC'] == 0:
+    if is_ok(out):
         params = out["P"]
         out["P"] = {
             "Hz": float(params[0]),
             "V":  float(params[1]),
         }
+    else:
+        out["P"] = {}
     return out
 
 # returning a slope distance and hz-angle, v-angle
 def TMC_QuickDist(sock):
     out = do_request(sock, 2117)
-    if out != None and out['RC_COM'] == 0 and out['RC'] == 0:
+    if is_ok(out):
         params = out["P"]
         out["P"] = {
             "dHz":            float(params[0]),
             "dV":             float(params[1]),
             "dSlopeDistance": float(params[2]),
         }
+    else:
+        out["P"] = {}
     return out
 
 # returning an angle, inclination and distance measurement
 def TMC_GetFullMeas(sock, WaitTime, Mode):
     out = do_request(sock, 2167, [WaitTime, Mode])
-    if out != None and out['RC_COM'] == 0 and out['RC'] == 0:
+    if is_ok(out):
         params = out["P"]
         out["P"] = {
             "Hz":        float(params[0]),
@@ -217,23 +236,31 @@ def TMC_GetFullMeas(sock, WaitTime, Mode):
             "SlopeDist": float(params[6]),
             "DistTime":  float(params[7]),
         }
+    else:
+        out["P"] = {}
     return out
 
 # carrying out a distance measurement
 # returning an angle, inclination and distance measurement
 def TMC_DoMeasure(sock, Command, Mode):
-    return do_request(sock, 2008, [Command, Mode])
+    out = do_request(sock, 2008, [Command, Mode])
+    out["P"] = {}
+    return out
 
 # getting the EDM measurement mode
 def TMC_GetEdmMode(sock):
     out = do_request(sock, 2021)
-    if out != None and out['RC_COM'] == 0 and out['RC'] == 0:
+    if is_ok(out):
         params = out["P"]
         out["P"] = {
             "Mode": int(params[0]),
         }
+    else:
+        out["P"] = {}
     return out
 
 # setting EDM measurement modes
 def TMC_SetEdmMode(sock, Mode):
-    return do_request(sock, 2020, [Mode.value])
+    out = do_request(sock, 2020, [Mode.value])
+    out["P"] = {}
+    return out
