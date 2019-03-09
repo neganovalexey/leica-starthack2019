@@ -104,15 +104,21 @@ def do_cancel_request(sock):
 
 # checking the communication
 def COM_NullProc(sock):
-    return do_request(sock, 0)
+    out = do_request(sock, 0)
+    out["P"] = {}
+    return out
 
 # turning the telescope to a specified position
 def AUT_MakePositioning(sock, Hz, V, POSMode=0, ATRMode=0):
-    return do_request(sock, 9027, [Hz, V, POSMode, ATRMode, 0])
+    out = do_request(sock, 9027, [Hz, V, POSMode, ATRMode, 0])
+    out["P"] = {}
+    return out
 
 # performing an automatic target search
 def AUT_Search(sock, Hz_Area, V_Area):
-    return do_request(sock, 9029, [Hz_Area, V_Area, 0])
+    out = do_request(sock, 9029, [Hz_Area, V_Area, 0])
+    out["P"] = {}
+    return out
 
 # measuring Hz,V angles and a single distance
 def BAP_MeasDistanceAngle(sock, DistMode = 2):
