@@ -122,7 +122,7 @@ class VideoCamera(object):
 
 class AugmentedSpace(object):
     def __init__(self, width, height):
-        fuze_trimesh = trimesh.load('teapot.obj')
+        fuze_trimesh = trimesh.load('models/teapot.obj')
         self.mesh = pyrender.Mesh.from_trimesh(fuze_trimesh) #, material=
         self.renderer = pyrender.OffscreenRenderer(width, height)
 
