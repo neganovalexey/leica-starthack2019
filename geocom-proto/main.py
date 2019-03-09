@@ -10,4 +10,6 @@ args = parser.parse_args()
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.connect((args.host, args.port))
 
+print(geocom.COM_NullProc(sock))
+
 sock.close()
