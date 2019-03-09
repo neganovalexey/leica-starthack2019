@@ -29,7 +29,7 @@ def parse_response(data):
 def do_request(sock, rpc, params=[]):
     req = make_request(rpc, params=params)
     sock.send(req)
-    data = s.recv(4096)
+    data = sock.recv(4096)
     if not data:
         print('\nDisconnected from server')
         return None
