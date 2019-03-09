@@ -1,4 +1,4 @@
-import socket
+import socket, select, sys
 import argparse
 
 def make_request(rpc, trId=None, params=[]):
@@ -24,4 +24,15 @@ s.connect((args.host, args.port))
 
 params = args.params.split(',') if len(args.params) > 0 else []
 s.send(make_request(args.rpc, params=params))
+
+read_sockets, write_sockets, error_sockets = select.select([s], [], [])
+for sock in read_sockets:
+    data = sock.recv(4096)
+    if not data:
+        print('\nDisconnected from server')
+        sys.exit()
+    else:
+        sys.stdout.write("\n")
+        message = data.decode()
+        sys.stdout.write(message)
 s.close()
