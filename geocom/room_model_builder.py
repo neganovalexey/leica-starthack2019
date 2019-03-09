@@ -25,8 +25,10 @@ class RoomModelBuilder:
         BAP_SetTargetType(sock, 1)
 
         v_per_edge = 15
-        max_distance = 15 # 1000
-        triangulation = Triangulation(v_per_edge, yaw_min=-np.pi*0.6, yaw_max=0.3, pitch_min=0, pitch_max=np.pi * 0.9)
+        max_distance = 10 # 1000
+        yaws = (-np.pi*0.6, 0.3)
+        pitchs = (0, np.pi*0.9)
+        triangulation = Triangulation(v_per_edge, yaws[0], yaws[1], pitchs[0], pitchs[1])
         self.vertices = np.zeros((v_per_edge, v_per_edge, 3))
         for (i, j, yaw, pitch) in triangulation:
             if i == 0 or i == v_per_edge - 1 or j == 0 or j == v_per_edge - 1:
@@ -50,6 +52,7 @@ class RoomModelBuilder:
                     print('zero retries left, replacing the point')
                     self.vertices[i][j] = utils.sph_to_dec(yaw, pitch, max_distance)
 
+        self.vertices[0][0] = utils.sph_to_dec((yaws[0] + yaws[1]) * 0.5, (pitchs[0] + pitchs[1]) * 0.5, max_distance * 2)
         np.save('vertices', self.vertices)
         sock.close()
 
@@ -58,6 +61,10 @@ class RoomModelBuilder:
     
     
     def _fli_ij(self, i, j):
+        if i < 0:
+            i = self.vertices.shape[0] + i
+        if j < 0:
+            j = self.vertices.shape[1] + j
         return i * self.vertices.shape[1] + j
     
     def _add_face(self, i1, j1, i2, j2, i3, j3):
@@ -69,13 +76,30 @@ class RoomModelBuilder:
     def build(self):
         self._load_last_vertices()
         
-        self.faces = np.zeros(((self.vertices.shape[0] - 1) * (self.vertices.shape[1] - 1) * 2, 3), dtype=int)
-        self.face_normals = np.zeros((self.faces.shape[0], 3))
+        faces_count = (self.vertices.shape[0]) * (self.vertices.shape[1]) * 2 - 6
+        self.faces = np.zeros((faces_count, 3), dtype=int)
+        self.face_normals = np.zeros((faces_count, 3))
         self.next_face = 0
+
         for i in range(self.vertices.shape[0] - 1):
             for j in range(self.vertices.shape[1] - 1):
                 self._add_face(i, j, i+1, j, i, j+1)
-                self._add_face(i, j+1, i+1, j, i+1, j+1)
+                if i != self.vertices.shape[0] - 2 or j != self.vertices.shape[0] - 2:
+                    self._add_face(i, j+1, i+1, j, i+1, j+1)
+                else:
+                    self._add_face(i, j+1, i+1, j, 0, 0)
+        
+        for i in range(0, self.vertices.shape[0] - 1):
+            if i > 0:
+                self._add_face(i, 0, 0, 0, i+1, 0)
+            if i < self.vertices.shape[0] - 2:
+                self._add_face(i, -1, i+1, -1, 0, 0)
+        for j in range(0, self.vertices.shape[1] - 1):
+            if j > 0:
+                self._add_face(0, j, 0, j+1, 0, 0)
+            if j < self.vertices.shape[1] - 2:
+                self._add_face(-1, j, 0, 0, -1, j+1)
+
         
         return Trimesh(vertices=self.vertices.reshape(-1, 3),
                        faces=self.faces,

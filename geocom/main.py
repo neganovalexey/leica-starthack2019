@@ -15,7 +15,19 @@ room_model = room_builder.build()
 
 import trimesh
 import pyrender
-mesh = pyrender.Mesh.from_trimesh(room_model)
+
 scene = pyrender.Scene()
+
+st_mesh = trimesh.load('../models/StartHack_StairsOnly.obj')
+st_mesh.apply_transform(np.array([
+       [0.1, 0.0, 0.0, 4.0],
+       [0.0, 0.1, 0.0, 0.0],
+       [0.0, 0.0, 0.1, 0.0],
+       [0.0, 0.0, 0.0, 1.0],
+    ]))
+#st_mesh = pyrender.Mesh.from_trimesh(fuze_trimesh)
+#scene.add(st_mesh)
+cst_mesh = trimesh.boolean.difference([st_mesh, room_model], engine='blender')
+mesh = pyrender.Mesh.from_trimesh(cst_mesh)
 scene.add(mesh)
 pyrender.Viewer(scene, use_raymond_lighting=True)
