@@ -112,7 +112,7 @@ def AUT_Search(sock, Hz_Area, V_Area):
     return do_request(sock, 9029, [Hz_Area, V_Area, 0])
 
 # measuring Hz,V angles and a single distance
-def BAP_MeasDistanceAngle(sock, DistMode):
+def BAP_MeasDistanceAngle(sock, DistMode = 2):
     out = do_request(sock, 17017, [DistMode])
     if out != None and out['RC_COM'] == 0 and out['RC'] == 0:
         params = out["P"]
@@ -126,7 +126,7 @@ def BAP_MeasDistanceAngle(sock, DistMode):
 
 # setting the distance measurement program
 def BAP_SetMeasPrg(sock, eMeasPrg):
-    return do_request(sock, 17019, [eMeasPrg])
+    return do_request(sock, 17019, [eMeasPrg.value])
 
 # setting the EDM type
 def BAP_SetTargetType(sock, eTargetType):
@@ -236,4 +236,4 @@ def TMC_GetEdmMode(sock):
 
 # setting EDM measurement modes
 def TMC_SetEdmMode(sock, Mode):
-    return do_request(sock, 2020, [Mode])
+    return do_request(sock, 2020, [Mode.value])
