@@ -73,3 +73,91 @@ def BAP_SetMeasPrg(sock, eMeasPrg):
 # setting the EDM type
 def BAP_SetTargetType(sock, eTargetType):
     return do_request(sock, 17021, [eTargetType])
+
+# getting the coordinates of a measured point
+def TMC_GetCoordinate(sock, WaitTime, Mode):
+    out = do_request(sock, 2082, [WaitTime, Mode])
+    if out != None and out['RC_COM'] == 0 and out['RC'] == 0:
+        params = out["P"]
+        out["P"] = {
+            "E":             float(params[0]),
+            "N":             float(params[1]),
+            "H":             float(params[2]),
+            "CoordTime":     int(params[3]),
+            "E-Cont":        float(params[4]),
+            "N-Cont":        float(params[5]),
+            "H-Cont":        float(params[6]),
+            "CoordContTime": int(params[7]),
+        }
+    return out
+
+# returning an angle and distance measurement
+def TMC_GetSimpleMea(sock, WaitTime, Mode):
+    out = do_request(sock, 2108, [WaitTime, Mode])
+    if out != None and out['RC_COM'] == 0 and out['RC'] == 0:
+        params = out["P"]
+        out["P"] = {
+            "Hz":            float(params[0]),
+            "V":             float(params[1]),
+            "SlopeDistance": float(params[2]),
+        }
+    return out
+
+# returning a complete angle measurement
+def TMC_GetAngle1(sock, Mode):
+    out = do_request(sock, 2003, [Mode])
+    if out != None and out['RC_COM'] == 0 and out['RC'] == 0:
+        params = out["P"]
+        out["P"] = {
+            "Hz":              float(params[0]),
+            "V":               float(params[1]),
+            "AngleAccuracy":   float(params[2]),
+            "AngleTime":       int(params[3]),
+            "CrossIncline":    float(params[4]),
+            "LengthIncline":   float(params[5]),
+            "AccuracyIncline": float(params[6]),
+            "InclineTime":     int(params[7]),
+            "FaceDef":         int(params[8]),
+        }
+    return out
+
+# returning a simple angle measurement
+def TMC_GetAngle5(sock, Mode):
+    out = do_request(sock, 2107, [Mode])
+    if out != None and out['RC_COM'] == 0 and out['RC'] == 0:
+        params = out["P"]
+        out["P"] = {
+            "Hz": float(params[0]),
+            "V":  float(params[1]),
+        }
+    return out
+
+# returning a slope distance and hz-angle, v-angle
+def TMC_QuickDist(sock):
+    out = do_request(sock, 2117)
+    if out != None and out['RC_COM'] == 0 and out['RC'] == 0:
+        params = out["P"]
+        out["P"] = {
+            "dHz":            float(params[0]),
+            "dV":             float(params[1]),
+            "dSlopeDistance": float(params[2]),
+        }
+    return out
+
+# returning an angle, inclination and distance measurement
+def TMC_GetFullMeas(sock, WaitTime, Mode):
+    out = do_request(sock, 2167, [WaitTime, Mode])
+    if out != None and out['RC_COM'] == 0 and out['RC'] == 0:
+        params = out["P"]
+        out["P"] = {
+            "Hz":        float(params[0]),
+            "V":         float(params[1]),
+            "AccAngle":  float(params[2]),
+            "C":         float(params[3]),
+            "L":         float(params[4]),
+            "AccIncl":   float(params[5]),
+            "SlopeDist": float(params[6]),
+            "DistTime":  float(params[7]),
+        }
+    return out
+
