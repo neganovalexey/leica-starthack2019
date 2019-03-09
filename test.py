@@ -125,7 +125,19 @@ class VideoCamera(object):
 
 class AugmentedSpace(object):
     def __init__(self, width, height):
-        fuze_trimesh = trimesh.load('models/teapot.obj')
+        fuze_trimesh = trimesh.load('models/stairs.obj')
+        gamma = pi / 2
+        fuze_trimesh.apply_transform(np.matmul(np.array([
+           [0.1, 0.0, 0.0, 4.0],
+           [0.0, 0.1, 0.0, 0.0],
+           [0.0, 0.0, 0.1, 0.0],
+           [0.0, 0.0, 0.0, 1.0],
+        ]), np.array([
+           [1, 0.0, 0.0, 0.0],
+           [0.0, cos(gamma), -sin(gamma), 0.0],
+           [0.0, sin(gamma), cos(gamma), 0.0],
+           [0.0, 0.0, 0.0, 1.0],
+        ])))
         self.mesh = pyrender.Mesh.from_trimesh(fuze_trimesh) #, material=
         self.renderer = pyrender.OffscreenRenderer(width, height)
 
@@ -145,9 +157,23 @@ class AugmentedSpace(object):
                [-sin(theta), 0.0, cos(theta), 0.0],
                [0.0, 0.0, 0.0, 1.0],
             ])
-        camera_pose = np.matmul(camera_rot_y, camera_rot_x)
-        camera_pose[1][3] = 3.0
+        camera_rot_z = np.eye(4)
+        # camera_rot_z = np.array([
+        #        [1, 0.0, 0.0, 0.0],
+        #        [0.0, cos(gamma), sin(gamma), 0.0],
+        #        [0.0, -sin(gamma), cos(gamma), 0.0],
+        #        [0.0, 0.0, 0.0, 1.0],
+        #     ])
+        camera_pose = np.matmul(np.matmul(camera_rot_y, camera_rot_x), camera_rot_z)
+        camera_pose[0][3] = 0.0
+        camera_pose[1][3] = 0.0
         camera_pose[2][3] = 7.0
+        # camera_pose =  np.array([
+        #        [1.0, 0.0, 0.0, -20],
+        #        [0.0, 1.0, 0.0, 3],
+        #        [0.0, 0.0, 1.0, 150],
+        #        [0.0, 0.0, 0.0, 1.0],
+        #     ])
         scene.add(camera, pose=camera_pose)
         
         # Set up the light
