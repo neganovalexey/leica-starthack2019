@@ -16,12 +16,12 @@ def parse_response(data):
     data = data.decode("ascii")
     data = data.split(':')
     hdr  = data[0].split(',')
-    body = data[1].split(',')
+    body = data[1].rstrip().split(',')
     return {
           "RC_COM": int(hdr[1]),
           "TrId":   int(hdr[2]),
           "RC":     int(body[0]),
-          "P":      body[1:-1],
+          "P":      body[1:],
     }
 
 def do_request(sock, rpc, params=[]):
