@@ -71,6 +71,26 @@ class EDM_MODE(Enum):
     EDM_PRECISE_IR      = 13
     EDM_PRECISE_TAPE    = 14
 
+class BAP_MEASURE_PRG(Enum):
+    BAP_NO_MEAS    = 0
+    BAP_NO_DIST    = 1
+    BAP_DEF_DIST   = 2
+    BAP_CLEAR_DIST = 3
+    BAP_STOP_TRK   = 4
+
+class BAP_USER_MEASPRG(Enum):
+    BAP_SINGLE_REF_STANDARD  = 0
+    BAP_SINGLE_REF_FAST      = 1
+    BAP_SINGLE_REF_VISIBLE   = 2
+    BAP_SINGLE_RLESS_VISIBLE = 3
+    BAP_CONT_REF_STANDARD    = 4
+    BAP_CONT_REF_FAST        = 5
+    BAP_CONT_RLESS_VISIBLE   = 6
+    BAP_AVG_REF_STANDARD     = 7
+    BAP_AVG_REF_VISIBLE      = 8
+    BAP_AVG_RLESS_VISIBLE    = 9
+    BAP_CONT_REF_SYNCHRO     = 10
+    BAP_SINGLE_REF_PRECISE   = 11
 
 # Methods
 # --------------------------------------------------------------------------------
