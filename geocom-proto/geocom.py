@@ -161,3 +161,21 @@ def TMC_GetFullMeas(sock, WaitTime, Mode):
         }
     return out
 
+# carrying out a distance measurement
+# returning an angle, inclination and distance measurement
+def TMC_DoMeasure(sock, Command, Mode):
+    return do_request(sock, 2008, [Command, Mode])
+
+# getting the EDM measurement mode
+def TMC_GetEdmMode(sock):
+    out = do_request(sock, 2021)
+    if out != None and out['RC_COM'] == 0 and out['RC'] == 0:
+        params = out["P"]
+        out["P"] = {
+            "Mode": int(params[0]),
+        }
+    return out
+
+# setting EDM measurement modes
+def TMC_SetEdmMode(sock, Mode):
+    return do_request(sock, 2020, [Mode])
