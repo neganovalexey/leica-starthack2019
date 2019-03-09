@@ -1,3 +1,5 @@
+from enum import Enum
+
 def make_request(rpc, trId=None, params=[]):
     result = "\n%R1Q," + str(rpc)
     if trId != None:
@@ -33,6 +35,42 @@ def do_request(sock, rpc, params=[]):
         return None
     else:
         return parse_response(data)
+
+# Enums
+# --------------------------------------------------------------------------------
+
+class TMC_INCLINE_PRG(Enum):
+    TMC_MEA_INC   = 0
+    TMC_AUTO_INC  = 1
+    TMC_PLANE_INC = 2
+
+class TMC_MEASURE_PRG(Enum):
+    TMC_STOP         = 0
+    TMC_DEF_DIST     = 1
+    TMC_CLEAR        = 2
+    TMC_SIGNAL       = 4
+    TMC_DO_MEASURE   = 6
+    TMC_RTRK_DIST    = 8
+    TMC_RED_TRK_DIST = 10
+    TMC_FREQUENCY    = 11
+
+class EDM_MODE(Enum):
+    EDM_MODE_NOT_USED   = 0
+    EDM_SINGLE_TAPE     = 1
+    EDM_SINGLE_STANDARD = 2
+    EDM_SINGLE_FAST     = 3
+    EDM_SINGLE_LRANGE   = 4
+    EDM_SINGLE_SRANGE   = 5
+    EDM_CONT_STANDARD   = 6
+    EDM_CONT_DYNAMIC    = 7
+    EDM_CONT_REFLESS    = 8
+    EDM_CONT_FAST       = 9
+    EDM_AVERAGE_IR      = 10
+    EDM_AVERAGE_SR      = 11
+    EDM_AVERAGE_LR      = 12
+    EDM_PRECISE_IR      = 13
+    EDM_PRECISE_TAPE    = 14
+
 
 # Methods
 # --------------------------------------------------------------------------------
