@@ -21,9 +21,25 @@ room_model = room_builder.build()
 import trimesh
 import pyrender
 
-#scene = pyrender.Scene()
+scene = pyrender.Scene()
 
-st_mesh = trimesh.load('../models/StartHack_StairsOnly.obj')
+
+
+# st_mesh = trimesh.load('../models/StartHack_StairsOnly.obj')
+# st_mesh.apply_transform(np.array([
+#        [0.1, 0.0, 0.0, 6.5],
+#        [0.0, 0.1, 0.0, 0.0],
+#        [0.0, 0.0, 0.1, -1.0],
+#        [0.0, 0.0, 0.0, 1.0],
+#     ]))
+# st_mesh = trimesh.load('../models/StartHack_Stairs.obj')
+# st_mesh.apply_transform(np.array([
+#        [0.1, 0.0, 0.0, 5.0],
+#        [0.0, 0.1, 0.0, 1.0],
+#        [0.0, 0.0, 0.1, -1.25],
+#        [0.0, 0.0, 0.0, 1.0],
+#     ]))
+st_mesh = trimesh.load('../models/teapot.obj')
 st_mesh.apply_transform(np.array([
        [0.1, 0.0, 0.0, 5.8],
        [0.0, 0.1, 0.0, 1.0],

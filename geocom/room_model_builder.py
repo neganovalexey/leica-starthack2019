@@ -78,7 +78,7 @@ class RoomModelBuilder:
     
     def _add_face(self, i1, j1, i2, j2, i3, j3):
         self.faces[self.next_face] = (self._fli_ij(i1, j1), self._fli_ij(i3, j3), self._fli_ij(i2, j2))
-        self.face_normals[self.next_face] = np.cross(self.vertices[i3][j3] - self.vertices[i1][j1],
+        self.face_normals[self.next_face] = -np.cross(self.vertices[i3][j3] - self.vertices[i1][j1],
                                                      self.vertices[i2][j2] - self.vertices[i1][j1])
         self.next_face += 1
 
@@ -112,5 +112,5 @@ class RoomModelBuilder:
         
         return Trimesh(vertices=self.vertices.reshape(-1, 3),
                        faces=self.faces,
-                       #face_normals=self.face_normals,
+                       face_normals=self.face_normals,
                        process = False)
