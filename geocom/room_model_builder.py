@@ -11,7 +11,7 @@ class RoomModelBuilder:
     def __init__(self):
         self.vertices = None
     
-    def measure_new_vertices(self, host, port):
+    def measure_new_vertices(self, host, port, recover = False, recover_i = 0, recover_j = 0):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((host, port))
 
@@ -24,21 +24,28 @@ class RoomModelBuilder:
         BAP_SetMeasPrg(sock, BAP_USER_MEASPRG.BAP_CONT_REF_STANDARD)
         BAP_SetTargetType(sock, 1)
 
-        v_per_edge = 15
-        max_distance = 10 # 1000
+        v_per_edge = 45
+        max_distance = 20 # 1000
         yaws = (-np.pi*0.6, 0.3)
-        pitchs = (0, np.pi*0.9)
+        pitchs = (np.pi*0.05, np.pi*0.85)
         triangulation = Triangulation(v_per_edge, yaws[0], yaws[1], pitchs[0], pitchs[1])
-        self.vertices = np.zeros((v_per_edge, v_per_edge, 3))
+        if recover:
+            self._load_last_vertices()
+        else:
+            self.vertices = np.zeros((v_per_edge, v_per_edge, 3))
         for (i, j, yaw, pitch) in triangulation:
+            if recover and (i != recover_i or j != recover_j):
+                continue
+            recover = False
+
             if i == 0 or i == v_per_edge - 1 or j == 0 or j == v_per_edge - 1:
                 # edges
                 self.vertices[i][j] = utils.sph_to_dec(yaw, pitch, max_distance)
                 continue
                 
-            retries = 3
+            retries = 2
             while retries > 0:
-                AUT_MakePositioning(sock, yaw + random.uniform(-0.03, 0.03), pitch + random.uniform(-0.03, 0.03))
+                AUT_MakePositioning(sock, yaw + random.uniform(-0.003, 0.003), pitch + random.uniform(-0.003, 0.003))
                 point = BAP_MeasDistanceAngle(sock)
                 if point['RC'] == 0:
                     point = point['P']
@@ -51,6 +58,8 @@ class RoomModelBuilder:
                     retries -= 1
                     print('zero retries left, replacing the point')
                     self.vertices[i][j] = utils.sph_to_dec(yaw, pitch, max_distance)
+            print(i, j)
+            np.save('vertices', self.vertices)
 
         self.vertices[0][0] = utils.sph_to_dec((yaws[0] + yaws[1]) * 0.5, (pitchs[0] + pitchs[1]) * 0.5, max_distance * 2)
         np.save('vertices', self.vertices)
