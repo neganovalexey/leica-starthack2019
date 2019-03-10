@@ -15,7 +15,7 @@ args = parser.parse_args()
 
 
 room_builder = RoomModelBuilder()
-#room_builder.measure_new_vertices(args.host, args.port)
+#room_builder.measure_new_vertices(args.host, args.port, True, 42, 40)
 room_model = room_builder.build()
 
 import trimesh
@@ -25,12 +25,13 @@ import pyrender
 
 st_mesh = trimesh.load('../models/StartHack_StairsOnly.obj')
 st_mesh.apply_transform(np.array([
-       [0.1, 0.0, 0.0, 6.5],
-       [0.0, 0.1, 0.0, 0.0],
-       [0.0, 0.0, 0.1, -1.0],
+       [0.1, 0.0, 0.0, 5.8],
+       [0.0, 0.1, 0.0, 1.0],
+       [0.0, 0.0, 0.1, -1.25],
        [0.0, 0.0, 0.0, 1.0],
     ]))
-objects = [st_mesh]#trimesh.boolean.difference([st_mesh, room_model], engine='blender')]
+objects = [trimesh.boolean.difference([st_mesh, room_model], engine='blender')]
+#scene.add(pyrender.Mesh.from_trimesh(objects[0]))
 #mesh = pyrender.Mesh.from_trimesh(st_mesh)
 #scene.add(mesh)
 #cmesh = pyrender.Mesh.from_trimesh(room_model)
@@ -60,7 +61,7 @@ def gen(camera, ar):
         theta = theta * np.pi / 180
         if frame is None:
             continue
-        ar_color, ar_depth = ar.get_frame(phi, theta)
+        ar_color, ar_depth = ar.get_frame(0.0, -1.0, 0.0, phi, theta)
         mask = np.repeat(np.expand_dims(ar_depth > 0.01, -1), 3, axis=-1) # 3 channels
         frame = np.where(mask, ar_color, frame)
         jpg = cv_to_jpg(frame)

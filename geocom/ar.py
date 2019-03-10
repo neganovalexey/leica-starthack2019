@@ -125,12 +125,18 @@ class AugmentedSpace(object):
     def __init__(self, width, height, objects):
         self.scene = pyrender.Scene(bg_color=np.zeros(4))
         for tmesh in objects:
+            tmesh.apply_transform(np.array([
+                [ 1.0, 0.0, 0.0, 0.0],
+                [ 0.0, 0.0, 1.0, 0.0],
+                [ 0.0, 1.0, 0.0, 0.0],
+                [ 0.0, 0.0, 0.0, 1.0]
+            ]))
             self.scene.add(pyrender.Mesh.from_trimesh(tmesh))
         light = pyrender.PointLight(color=np.ones(3), intensity=30.0)
         self.scene.add(light)
         self.renderer = pyrender.OffscreenRenderer(width, height)
 
-    def get_frame(self, phi, theta):
+    def get_frame(self, cam_x, cam_y, cam_z, phi, theta):
         camera = pyrender.PerspectiveCamera(yfov = v_fov * pi / 180)
         camera_rot_y = np.array([
                [1.0, 0.0, 0.0, 0.0],
@@ -152,9 +158,9 @@ class AugmentedSpace(object):
         #        [0.0, 0.0, 0.0, 1.0],
         #     ])
         camera_pose = np.matmul(np.matmul(camera_rot_y, camera_rot_x), camera_rot_z)
-        camera_pose[0][3] = 0.0
-        camera_pose[1][3] = 0.0
-        camera_pose[2][3] = 0.0
+        camera_pose[0][3] = cam_x
+        camera_pose[1][3] = cam_y
+        camera_pose[2][3] = cam_z
         # camera_pose =  np.array([
         #        [1.0, 0.0, 0.0, -20],
         #        [0.0, 1.0, 0.0, 3],
